@@ -1,0 +1,1719 @@
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<stdlib.h>
+#include<time.h>
+#include<windows.h>
+#include<conio.h>
+
+#define random(a,b) (rand()%(b-a+1)+a)
+using namespace std;
+const int hx=25,hy=50;
+int fx[4]={1,-1,0,0},fy[4]={0,0,1,-1};
+char in;
+int mapa[hx+1][hy+1];// 0 = ÕÏ°­Îï £» 1 = ¿ÕÆø £» 2 = µÐÈË £» 
+int pd=0;
+int mappd=1;
+int drman=0;
+int myHP=20,mygjnum=1,mygjjl=1,mymoney=1,mygjsh=1;
+char jn1='N',jn2='N',jn3='N';
+int money=0;
+int randjl[101];
+void gotoxy(int x, int y)
+{
+    	COORD pos = {x,y};
+    	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+   		SetConsoleCursorPosition(hOut, pos);
+}//ÒÆ¶¯¹â±ê
+void HideCursor()
+{
+	CONSOLE_CURSOR_INFO cursor_info = {1, 0}; 
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
+}//Òþ²Ø¹â±ê 
+long long ksm(long long s,long long k)
+{
+    long long rr=1;
+    while(k)
+    {
+        if(k%2==1)
+            rr=rr*s;
+        s=s*s;
+        k/=2;
+    }
+    return rr;
+}
+int change()
+{
+	
+	for(int i=0;i<30;i++)
+	{
+		int x=rand()%(hx)+1;
+		int y=rand()%(hy)+1;
+		mapa[x][y]=0;
+	}
+	
+}
+
+void gyout()
+{
+	gotoxy(30,14);
+	cout<<"×÷Õß£º Rolt"; 
+	if(in=getch())
+	{
+		system("cls");
+		return;
+	}
+	
+}
+
+void gameout()
+{
+	
+	SetConsoleOutputCP(936);//Êä³öÖÐÎÄ 
+	
+	gotoxy(25,4+5);
+	cout<<"C++:Code revolution";
+	gotoxy(50+20,14+5);
+	printf("%c",16);
+	gotoxy(52+20,14+5);
+	cout<<"ÔËÐÐ";
+	gotoxy(52+20,18+5);
+	cout<<"»ØËÝ"; 
+	gotoxy(52+20,22+5);
+	cout<<"ËµÃ÷"; 
+}
+
+struct MYGJ
+{
+	int pd;
+	int it;
+	int x;
+	int y;
+	int fx;
+}mygj[500];
+
+struct DRGJ
+{
+	bool pd;
+	int it;
+	int x;
+	int y;
+	int fx;
+}drgj[100];
+
+void storeout()
+{
+	SetConsoleOutputCP(936);
+	gotoxy(65,3);
+	printf("                 ");
+	gotoxy(65,3);
+	printf("%c %d",15,money);
+	gotoxy(20,2+5);
+	printf("Êä³ö");
+	gotoxy(20,5+5);
+	printf("Ëã·¨");
+	gotoxy(20,29+5);
+	printf("Àë¿ªÉÌµê");
+}
+void storeout1()
+{
+	SetConsoleOutputCP(936);
+	gotoxy(65,3);
+	printf("                 ");
+	gotoxy(65,3);
+	printf("%c %d",15,money);
+	gotoxy(20+10,2+5);
+	printf("%c ×Óµ¯ÉÏÏÞ  µ±Ç°£º%d  %c %d",23,mygjnum,15,ksm(mygjnum,3));
+	gotoxy(20+10,5+5);
+	printf("%c Éä»÷¾àÀë  µ±Ç°£º%d  %c %d",124,mygjjl,15,mygjjl*10);
+	gotoxy(20+10,29+5);
+	printf("·µ»Ø");
+}
+void storeout2()
+{
+	SetConsoleOutputCP(936);
+	gotoxy(65,3);
+	printf("                 ");
+	gotoxy(65,3);
+	printf("%c %d",15,money);
+	gotoxy(20+10,2+5);
+	printf("%c ÈýÎ»Ò»Ìå  ×´Ì¬£º%c  %c %d",6,jn1,15,10000);
+	gotoxy(20+10,5+5);
+	printf("%c ·ÖÖÎ×ÓÄ¸  ×´Ì¬£º%c  %c %d",21,jn2,15,100000);
+	gotoxy(20+10,8+5);
+	printf("%c ¶þ²æ·ÖÁÑ  ×´Ì¬£º%c  %c %d",19,jn3,15,500000);
+	gotoxy(20+10,29+5);
+	printf("·µ»Ø");
+}
+
+void store()
+{	
+	int jtx=20-3,jty=2+5,xz1=1,xz2=1,xzpd=1;
+	
+	storeout();
+	
+	while(1)
+	{
+		if(kbhit())	//ÈËÎï¿ØÖÆ 
+		{
+			gotoxy(jtx,jty);
+			printf(" ");
+			in=getch();
+			if(in=='w')
+			{
+				if(xzpd==1)
+				{
+					jty-=3;
+					xz1--;
+				}
+				else if(xzpd==2)
+				{
+					jty-=3;
+					xz2--;
+				}
+				
+			}
+			else if(in=='s')
+			{
+				if(xzpd==1)
+				{
+					jty+=3;
+					xz1++;
+				}
+				else if(xzpd==2)
+				{
+					jty+=3;
+					xz2++;
+				} 
+				
+			}
+			else if(in==' ')
+			{
+				if(xz1==1)
+				{
+					if(xzpd==1)
+					{
+						xzpd=2;
+						jtx+=10;
+						for(int i=0;i<8;i++)
+						{
+							gotoxy(20-i,2+5);
+							printf("Êä³ö-");
+							gotoxy(20-i,5+5);
+							printf("Ëã·¨ ");
+							Sleep(100);
+						}
+						gotoxy(20,29+5);
+						printf("       ");
+						storeout1();
+					}
+					else if(xz2==1)
+					{
+						if(money>=ksm(mygjnum,3)&&mygjnum<500)
+						{
+							mygjnum++;
+							money-=ksm(mygjnum,3);
+							storeout1();
+						}
+						else
+						{
+							gotoxy(jtx,jty);
+							printf("!");
+							Sleep(500);
+							storeout1();
+						}
+				
+					}
+					else if(xz2==2)
+					{
+						if(money>=mygjjl*10&&mygjjl<20)
+						{
+							mygjjl++;
+							money-=mygjjl*10;
+							storeout1();
+						}
+						else
+						{
+							gotoxy(jtx,jty);
+							printf("!");
+							Sleep(500);
+							storeout1();
+						}
+					
+					}
+					else if(xz2==10)
+					{	
+						xzpd=1;
+						jtx-=10;
+						jty=2+5;
+						xz1=1;
+						xz2=1;
+						gotoxy(20+10,2+5);
+						printf("                                  ");
+						gotoxy(20+10,5+5);
+						printf("                                  ");
+						gotoxy(20+10,29+5);
+						printf("    ");
+						for(int i=8;i>=0;i--)
+						{
+							gotoxy(20-i,2+5);
+							printf(" Êä³ö");
+							gotoxy(20-i,5+5);
+							printf(" Ëã·¨");
+							Sleep(100);
+						}
+						gotoxy(20,29+5);
+						printf("Àë¿ªÉÌµê");
+					}
+				}
+				else if(xz1==2)
+				{
+					if(xzpd==1)
+					{
+						xzpd=2;
+						jtx+=10;
+						jty=2+5;
+						for(int i=0;i<8;i++)
+						{
+							gotoxy(20-i,2+5);
+							printf("Êä³ö ");
+							gotoxy(20-i,5+5);
+							printf("Ëã·¨-");
+							Sleep(100);
+						}
+						gotoxy(20,29+5);
+						printf("       ");
+						storeout2();
+					}
+					else if(xz2==1)
+					{
+						if(money>=10000&&jn1=='N')
+						{
+							jn1='Y';
+							money-=10000;
+							storeout2();
+						}
+						else
+						{
+							gotoxy(jtx,jty);
+							printf("!");
+							Sleep(500);
+							storeout2();
+						}
+					}
+					else if(xz2==2)
+					{
+						if(money>=100000&&jn2=='N')
+						{
+							jn2='Y';
+							money-=100000;
+							storeout2();
+						}
+						else
+						{
+							gotoxy(jtx,jty);
+							printf("!");
+							Sleep(500);
+							storeout2();
+						}
+					}
+					else if(xz2==3)
+					{
+						if(money>=500000&&jn3=='N')
+						{
+							jn3='Y';
+							money-=500000;
+							storeout2();
+						}
+						else
+						{
+							gotoxy(jtx,jty);
+							printf("!");
+							Sleep(500);
+							storeout2();
+						}
+					}
+					else if(xz2==10)
+					{	
+						xzpd=1;
+						jtx-=10;
+						jty=5+5;
+						xz1=2;
+						xz2=1;
+						gotoxy(20+10,2+5);
+						printf("                                  ");
+						gotoxy(20+10,5+5);
+						printf("                                  ");
+						gotoxy(20+10,8+5);
+						printf("                                  ");
+						gotoxy(20+10,29+5);
+						printf("    ");
+						for(int i=8;i>=0;i--)
+						{
+							gotoxy(20-i,2+5);
+							printf(" Êä³ö");
+							gotoxy(20-i,5+5);
+							printf(" Ëã·¨");
+							Sleep(100);
+						}
+						gotoxy(20,29+5);
+						printf("Àë¿ªÉÌµê");
+					}
+				}
+				else if(xz1==10)
+				{
+					mappd=1;
+					system("cls");
+					return;
+				}		
+			}
+		} 
+		gotoxy(jtx,jty);
+		printf("%c",16);
+		Sleep(100);
+	}
+}
+int map()
+{
+	srand(time(0));
+	memset(mapa,0,sizeof(mapa));
+	for(int i=1;i<hx+1;i++)
+		for(int j=1;j<hy+1;j++)
+			mapa[i][j]=1;
+	change();		
+	mapa[1][1]=1;
+	mapa[hx][hy]=1;
+	SetConsoleOutputCP(437);//Êä³öºÚ¿é 
+	for(int i=0;i<=hx+1;i++)
+	{
+		for(int j=0;j<=hy+1;j++)
+		{
+			gotoxy(j+20,i+5);
+			if(mapa[i][j]==1)
+				cout<<" ";
+			else
+				printf("%c", 219);
+		
+		}
+		
+	}
+	
+}
+void map2()
+{
+	for(int j=20;j<=30;j++)
+	{
+		mapa[0][j]=3;
+		mapa[hx+1][j]=3;
+		gotoxy(j+20,5);
+		cout<<"#";
+		gotoxy(j+20,hx+1+5);
+		cout<<"#";
+	}
+	for(int i=10;i<=15;i++)
+	{
+		mapa[i][0]=3;
+		mapa[i][hy+1]=3;
+		gotoxy(20,i+5);
+		cout<<"#";
+		gotoxy(hy+1+20,i+5);
+		cout<<"#";
+	}
+	for(int i=0;i<100;i++)
+		drgj[i].pd=0;
+	drman=0;
+	for(int i=0;i<mygjnum;i++)	
+					if(mygj[i].pd!=0)
+					{
+						if(mygj[i].fx==1)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y-mygj[i].it+1+5);
+								cout<<" ";
+							}
+						}
+						else if(mygj[i].fx==2)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y+mygj[i].it-1+5);
+								cout<<" ";
+							}
+						}
+						else if(mygj[i].fx==3)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x-mygj[i].it+1+20,mygj[i].y+5);
+								cout<<" ";	
+							}
+						}
+							else if(mygj[i].fx==4)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+mygj[i].it-1+20,mygj[i].y+5);
+								cout<<" ";	
+							}
+						}
+					}
+				memset(mygj,0,sizeof(mygj));
+	
+}
+void gomap()
+{
+	srand((unsigned)time(NULL));
+	if(randjl[99]==0)
+	{
+		for(int i=0;i<100;i++)
+			randjl[i]=random(1,10000);
+	}
+	for(int i=0;i<100;i++)
+	{
+		if(randjl[i]!=0)
+		{
+			if(randjl[i]%10==0)
+			{
+				system("cls");
+				mappd=2;
+			}
+			else
+			{
+				map();
+				map2();
+				gotoxy(18+20,35);
+				cout<<"Random area "<<randjl[i];
+				
+			}
+			
+			randjl[i]=0;
+			break;
+			
+		}
+	}
+    
+}
+void cg2()
+{
+	for(int i=0;i<10;i++)
+	{
+		gotoxy(18+20,14+5);
+		cout<<"System loading..."; 
+		map();
+	}
+}
+
+
+
+int game()
+{
+	int rx=1,ry=1,rfx=1;
+	int mapt1=0;	//mapt1 µØÍ¼Ë¢ÐÂÊ±¼ä 
+	int rt1=0;	//rt1 ÈËÎï×Óµ¯Ê±¼ä 
+	int drt1=0,drt2=0,drt3=0,drt5=0;	//drt1 µÐÈËÐÐÎªÊ±¼ä drt2 µÐÈËÉú³ÉÊ±¼ä drt3 µÐÈË×Óµ¯Ê±¼ä 
+	int drhp[hx+1][hy+1],drt4[hx+1][hy+1];
+	memset(drt4,0,sizeof(drt4));
+	memset(drhp,0,sizeof(drhp));
+	memset(mygj,0,sizeof(mygj));
+	memset(drgj,0,sizeof(drgj));
+	gotoxy(rx+20,ry+5);
+	printf("%c",1);
+	
+	gotoxy(10,3);
+	cout<<"HP:";
+	for(int i=0;i<myHP;i++)
+		printf("%c", 3);
+	
+	gotoxy(65,3);
+	printf("%c %d",15,money);
+		
+	while(1)
+	{
+		if(mappd==1)
+		{
+		if(kbhit())	//ÈËÎï¿ØÖÆ 
+		{
+			in=getch();
+			if(in=='w')
+			{
+				if(mapa[ry-1][rx]==1)
+				{
+					rfx=1;
+					gotoxy(rx+20,ry+5);	cout<<" ";
+					ry--;
+					gotoxy(rx+20,ry+5);	printf("%c",1);
+				}
+				else if(mapa[ry-1][rx]==3)
+				{
+					rfx=1;
+					gomap();
+					ry=hx;
+					gotoxy(rx+20,ry+5);	printf("%c",1);
+				}
+				
+			}
+			else if(in=='s')
+			{
+				if(mapa[ry+1][rx]==1)
+				{
+					rfx=2;
+					gotoxy(rx+20,ry+5);	cout<<" ";
+					ry++;
+					gotoxy(rx+20,ry+5);	printf("%c",1);	
+				}
+				else if(mapa[ry+1][rx]==3)
+				{
+					rfx=2;
+					gomap();
+					ry=1;
+					gotoxy(rx+20,ry+5);	printf("%c",1);
+				}
+				
+			}
+			else if(in=='a')
+			{
+				if(mapa[ry][rx-1]==1)
+				{
+					rfx=3;
+					gotoxy(rx+20,ry+5);	cout<<" ";
+					rx--;
+					gotoxy(rx+20,ry+5);	printf("%c",1);	
+				}
+				else if(mapa[ry][rx-1]==3)
+				{
+					rfx=3;
+					gomap();
+					rx=hy;
+					gotoxy(rx+20,ry+5);	printf("%c",1);	
+				}
+				
+			}
+			else if(in=='d')
+			{
+				if(mapa[ry][rx+1]==1)
+				{
+					rfx=4;
+					gotoxy(rx+20,ry+5);	cout<<" ";
+					rx++;
+					gotoxy(rx+20,ry+5);	printf("%c",1);	
+				}
+				else if(mapa[ry][rx+1]==3)
+				{
+					rfx=4;
+					gomap();
+					rx=1;
+					gotoxy(rx+20,ry+5);	printf("%c",1);	
+				}
+				
+			}
+			else if(in=='j')
+			{
+				for(int i=0;i<mygjnum;i++)
+				{
+					if(mygj[i].pd==0)
+					{
+						mygj[i].x=rx;
+						mygj[i].y=ry;
+						mygj[i].fx=rfx;
+						mygj[i].it=1;
+						mygj[i].pd=1;
+						break;
+					}
+				}
+						
+			}
+			else if(in=='k'&&jn1=='Y')
+			{
+				for(int j=-1;j<2;j++)
+				for(int i=0;i<mygjnum;i++)
+				{
+					if(mygj[i].pd==0)
+					{
+						mygj[i].x=rx+j;
+						mygj[i].y=ry+j;
+						mygj[i].fx=rfx;
+						mygj[i].it=1;
+						mygj[i].pd=2;
+						break;
+					}
+				}
+			}
+			else if(in=='o'&&jn2=='Y')
+			{
+				for(int i=0;i<mygjnum;i++)
+				{
+					if(mygj[i].pd==0)
+					{
+						mygj[i].x=rx;
+						mygj[i].y=ry;
+						mygj[i].fx=rfx;
+						mygj[i].it=1;
+						mygj[i].pd=3;
+						break;
+					}
+				}
+			}
+			else if(in=='i'&&jn3=='Y')
+			{
+				for(int i=0;i<mygjnum;i++)
+				{
+					if(mygj[i].pd==0)
+					{
+						mygj[i].x=rx;
+						mygj[i].y=ry;
+						mygj[i].fx=rfx;
+						mygj[i].it=1;
+						mygj[i].pd=4;
+						break;
+					}
+				}
+			}
+			else if(in=='l')
+			{
+				if(mapa[ry-1][rx]==1)
+				{
+					mapa[ry-1][rx]=2;
+					drhp[ry-1][rx]=32;
+					gotoxy(rx+20,ry-1+5);
+					printf("%c",2);
+					drman++;
+				}
+			}
+			else if(in=='u')
+			{
+				for(int i=0;i<mygjnum;i++)	
+					if(mygj[i].pd!=0)
+					{
+						if(mygj[i].fx==1)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y-mygj[i].it+1+5);
+								cout<<" ";
+							}
+						}
+						else if(mygj[i].fx==2)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y+mygj[i].it-1+5);
+								cout<<" ";
+							}
+						}
+						else if(mygj[i].fx==3)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x-mygj[i].it+1+20,mygj[i].y+5);
+								cout<<" ";	
+							}
+						}
+							else if(mygj[i].fx==4)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+mygj[i].it-1+20,mygj[i].y+5);
+								cout<<" ";	
+							}
+						}
+					}
+				memset(mygj,0,sizeof(mygj));
+			}
+				
+		}
+		
+		if(myHP<=0)
+		{
+			gotoxy(20+20,15+5);
+			cout<<"GAME OVER!";
+			Sleep(1000);
+			myHP=20;
+			system("cls");
+			//map();
+			//game();
+			
+			break;
+		}
+		
+		gotoxy(65,3);
+		printf("%c %d",15,money);
+		
+		int gjjl;
+	
+		if(rt1>=5)	
+		{
+			for(int i=0;i<mygjnum;i++)	
+				if(mygj[i].pd!=0)
+				{	
+					int gjtx[5]={0,124,124,45,45};
+					if(mygj[i].pd==1)
+					{
+						gjjl=mygjjl+1;
+					}
+					else if(mygj[i].pd==2)
+					{
+						gjjl=mygjjl*2+1;
+					}
+					else if(mygj[i].pd==3)
+					{
+						gjjl=mygjjl*4+1;
+						gjtx[1]=4;
+						gjtx[2]=4;
+						gjtx[3]=4;
+						gjtx[4]=4;
+					}
+					else if(mygj[i].pd==4)
+					{
+						gjjl=mygjjl*8+1;
+					}
+					
+					if(mygj[i].it<gjjl)
+					{
+						if(mygj[i].fx==1)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y-mygj[i].it+1+5);
+								cout<<" ";
+							}
+							if(mapa[mygj[i].y-mygj[i].it][mygj[i].x]==1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y-mygj[i].it+5);
+								//cout<<"|";
+								printf("%c",gjtx[1]);
+								
+							}
+							else
+							{
+								if(mapa[mygj[i].y-mygj[i].it][mygj[i].x]==2)
+								{
+									money+=mymoney;
+									drhp[mygj[i].y-mygj[i].it][mygj[i].x]-=mygjsh;
+									for(int k=0;k<70;k++)
+									{
+										gotoxy(15+k,33);
+										cout<<" ";
+									}
+									for(int k=0;k<drhp[mygj[i].y-mygj[i].it][mygj[i].x];k++)
+									{
+										gotoxy(70,33);
+										cout<<"HP";
+										drt5=100;
+										gotoxy(70-1-k,33);
+										printf("%c",254);
+									}
+										
+									
+									if(mygj[i].pd==4)
+									{
+										if(mapa[mygj[i].y-mygj[i].it][mygj[i].x-1]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x;
+													mygj[k].y=mygj[i].y-mygj[i].it;
+													mygj[k].fx=3;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+										if(mapa[mygj[i].y-mygj[i].it][mygj[i].x+1]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x;
+													mygj[k].y=mygj[i].y-mygj[i].it;
+													mygj[k].fx=4;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+									}	
+								}
+								else if(mygj[i].pd==4)
+								{
+									if(mapa[mygj[i].y-mygj[i].it+1][mygj[i].x-1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x;
+												mygj[k].y=mygj[i].y-mygj[i].it+1;
+												mygj[k].fx=3;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+									if(mapa[mygj[i].y-mygj[i].it+1][mygj[i].x+1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x;
+												mygj[k].y=mygj[i].y-mygj[i].it+1;
+												mygj[k].fx=4;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+								}
+								
+								//mygj[i].it=gjjl;
+								mygj[i].pd=0;
+							}
+							if(mygj[i].pd==3)
+							{
+								for(int fx=3;fx<=4;fx++)
+								for(int j=-1;j<2;j++)
+									for(int k=0;k<mygjnum;k++)
+									{
+										if(mygj[k].pd==0)
+										{
+											mygj[k].x=mygj[i].x;
+											mygj[k].y=mygj[i].y-mygj[i].it+j;
+											mygj[k].fx=fx;
+											mygj[k].it=1;
+											mygj[k].pd=2;
+											break;
+										}
+									}
+							}
+						}
+						else if(mygj[i].fx==2)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y+mygj[i].it-1+5);
+								cout<<" ";
+							}
+							if(mapa[mygj[i].y+mygj[i].it][mygj[i].x]==1)
+							{
+								gotoxy(mygj[i].x+20,mygj[i].y+mygj[i].it+5);
+								//cout<<"|";
+								printf("%c",gjtx[2]);
+								
+							}
+							else
+							{
+								if(mapa[mygj[i].y+mygj[i].it][mygj[i].x]==2)
+								{
+									money+=mymoney;
+									drhp[mygj[i].y+mygj[i].it][mygj[i].x]-=mygjsh;
+									for(int k=0;k<70;k++)
+									{
+										gotoxy(15+k,33);
+										cout<<" ";
+									}
+									for(int k=0;k<drhp[mygj[i].y+mygj[i].it][mygj[i].x];k++)
+									{
+										gotoxy(70,33);
+										cout<<"HP";
+										drt5=100;
+										gotoxy(70-1-k,33);
+										printf("%c",254);
+									}
+									
+									if(mygj[i].pd==4)
+									{
+										if(mapa[mygj[i].y+mygj[i].it][mygj[i].x-1]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x;
+													mygj[k].y=mygj[i].y+mygj[i].it;
+													mygj[k].fx=3;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+										if(mapa[mygj[i].y+mygj[i].it][mygj[i].x+1]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x;
+													mygj[k].y=mygj[i].y+mygj[i].it;
+													mygj[k].fx=4;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+									}
+								}
+								else if(mygj[i].pd==4)
+								{
+									if(mapa[mygj[i].y+mygj[i].it-1][mygj[i].x-1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x;
+												mygj[k].y=mygj[i].y+mygj[i].it-1;
+												mygj[k].fx=3;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+									if(mapa[mygj[i].y+mygj[i].it-1][mygj[i].x+1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x;
+												mygj[k].y=mygj[i].y+mygj[i].it-1;
+												mygj[k].fx=4;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+								}
+								
+								//mygj[i].it=gjjl;
+								mygj[i].pd=0;
+							}
+							if(mygj[i].pd==3)
+							{
+								for(int fx=3;fx<=4;fx++)
+								for(int j=-1;j<2;j++)
+									for(int k=0;k<mygjnum;k++)
+									{
+										if(mygj[k].pd==0)
+										{
+											mygj[k].x=mygj[i].x;
+											mygj[k].y=mygj[i].y+mygj[i].it+j;
+											mygj[k].fx=fx;
+											mygj[k].it=1;
+											mygj[k].pd=2;
+											break;
+										}
+									}
+							}
+						}
+						else if(mygj[i].fx==3)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x-mygj[i].it+1+20,mygj[i].y+5);
+								cout<<" ";	
+							}
+							if(mapa[mygj[i].y][mygj[i].x-mygj[i].it]==1)
+							{
+								gotoxy(mygj[i].x-mygj[i].it+20,mygj[i].y+5);
+								//cout<<"-";
+								printf("%c",gjtx[3]);
+								
+							}
+							else
+							{
+								if(mapa[mygj[i].y][mygj[i].x-mygj[i].it]==2)
+								{	
+									money+=mymoney;
+									drhp[mygj[i].y][mygj[i].x-mygj[i].it]-=mygjsh;
+									for(int k=0;k<70;k++)
+									{
+										gotoxy(15+k,33);
+										cout<<" ";
+									}
+									for(int k=0;k<drhp[mygj[i].y][mygj[i].x-mygj[i].it];k++)
+									{
+										gotoxy(70,33);
+										cout<<"HP";
+										drt5=100;
+										gotoxy(70-1-k,33);
+										printf("%c",254);
+									}
+									
+									if(mygj[i].pd==4)
+									{
+										if(mapa[mygj[i].y-1][mygj[i].x-mygj[i].it]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x-mygj[i].it;
+													mygj[k].y=mygj[i].y;
+													mygj[k].fx=1;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+										if(mapa[mygj[i].y+1][mygj[i].x-mygj[i].it]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x-mygj[i].it;
+													mygj[k].y=mygj[i].y;
+													mygj[k].fx=2;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+									}
+								}
+								else if(mygj[i].pd==4)
+								{
+									if(mapa[mygj[i].y-1][mygj[i].x-mygj[i].it+1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x-mygj[i].it+1;
+												mygj[k].y=mygj[i].y;
+												mygj[k].fx=1;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+									if(mapa[mygj[i].y+1][mygj[i].x-mygj[i].it+1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x-mygj[i].it+1;
+												mygj[k].y=mygj[i].y;
+												mygj[k].fx=2;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+								}
+								
+								//mygj[i].it=gjjl;
+								mygj[i].pd=0;
+							}
+							if(mygj[i].pd==3)
+							{
+								for(int fx=1;fx<=2;fx++)
+								for(int j=-1;j<2;j++)
+									for(int k=0;k<mygjnum;k++)
+									{
+										if(mygj[k].pd==0)
+										{
+											mygj[k].x=mygj[i].x-mygj[i].it+j;
+											mygj[k].y=mygj[i].y;
+											mygj[k].fx=fx;
+											mygj[k].it=1;
+											mygj[k].pd=2;
+											break;
+										}
+									}
+							}
+						}
+						else if(mygj[i].fx==4)
+						{
+							if(mygj[i].it!=1)
+							{
+								gotoxy(mygj[i].x+mygj[i].it-1+20,mygj[i].y+5);
+								cout<<" ";	
+							}
+							if(mapa[mygj[i].y][mygj[i].x+mygj[i].it]==1)
+							{
+								gotoxy(mygj[i].x+mygj[i].it+20,mygj[i].y+5);
+								//cout<<"-";
+								printf("%c",gjtx[4]);
+							
+							}
+							else
+							{
+								if(mapa[mygj[i].y][mygj[i].x+mygj[i].it]==2)
+								{
+									money+=mymoney;
+									drhp[mygj[i].y][mygj[i].x+mygj[i].it]-=mygjsh;
+									for(int k=0;k<70;k++)
+									{
+										gotoxy(15+k,33);
+										cout<<" ";
+									}
+									for(int k=0;k<drhp[mygj[i].y][mygj[i].x+mygj[i].it];k++)
+									{
+										gotoxy(70,33);
+										cout<<"HP";
+										drt5=100;
+										gotoxy(70-1-k,33);
+										printf("%c",254);
+									}
+									
+									if(mygj[i].pd==4)
+									{
+										if(mapa[mygj[i].y-1][mygj[i].x+mygj[i].it]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x+mygj[i].it;
+													mygj[k].y=mygj[i].y;
+													mygj[k].fx=1;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+										if(mapa[mygj[i].y+1][mygj[i].x+mygj[i].it]==1)
+										{
+											for(int k=0;k<mygjnum;k++)
+											{
+												if(mygj[k].pd==0)
+												{
+													mygj[k].x=mygj[i].x+mygj[i].it;
+													mygj[k].y=mygj[i].y;
+													mygj[k].fx=2;
+													mygj[k].it=1;
+													mygj[k].pd=4;
+													break;
+												}
+											}
+										}
+									}
+								}
+								else if(mygj[i].pd==4)
+								{
+									if(mapa[mygj[i].y-1][mygj[i].x+mygj[i].it-1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x+mygj[i].it-1;
+												mygj[k].y=mygj[i].y;
+												mygj[k].fx=1;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+									if(mapa[mygj[i].y+1][mygj[i].x+mygj[i].it-1]==1)
+									{
+										for(int k=0;k<mygjnum;k++)
+										{
+											if(mygj[k].pd==0)
+											{
+												mygj[k].x=mygj[i].x+mygj[i].it-1;
+												mygj[k].y=mygj[i].y;
+												mygj[k].fx=2;
+												mygj[k].it=1;
+												mygj[k].pd=4;
+												break;
+											}
+										}
+									}
+								}
+								
+								//mygj[i].it=gjjl;
+								mygj[i].pd=0;
+							}
+							if(mygj[i].pd==3)
+							{
+								for(int fx=1;fx<=2;fx++)
+								for(int j=-1;j<2;j++)
+									for(int k=0;k<mygjnum;k++)
+									{
+										if(mygj[k].pd==0)
+										{
+											mygj[k].x=mygj[i].x+mygj[i].it+j;
+											mygj[k].y=mygj[i].y;
+											mygj[k].fx=fx;
+											mygj[k].it=1;
+											mygj[k].pd=2;
+											break;
+										}
+									}
+							}
+						}
+						mygj[i].it++;
+					}
+					else
+					{
+						if(mygj[i].fx==1)
+						{
+							gotoxy(mygj[i].x+20,mygj[i].y-mygj[i].it+1+5);
+							cout<<" ";
+						}
+						else if(mygj[i].fx==2)
+						{
+							gotoxy(mygj[i].x+20,mygj[i].y+mygj[i].it-1+5);
+							cout<<" ";
+						}
+						else if(mygj[i].fx==3)
+						{
+							gotoxy(mygj[i].x-mygj[i].it+1+20,mygj[i].y+5);
+							cout<<" ";	
+						}
+						else if(mygj[i].fx==4)
+						{
+							gotoxy(mygj[i].x+mygj[i].it-1+20,mygj[i].y+5);
+							cout<<" ";
+						}
+						mygj[i].pd=0;
+					}
+				}
+				rt1=0;		
+		}
+		
+		int drgjjl=20;
+		if(drt3>=10)
+		{
+		for(int i=0;i<100;i++)
+			if(drgj[i].pd==1)
+				if(drgj[i].it<drgjjl)
+				{//ÏÂÉÏÓÒ×ó 
+					if(drgj[i].fx==0)
+					{
+						if(drgj[i].it!=1)
+						{
+							gotoxy(drgj[i].x+20,drgj[i].y+drgj[i].it-1+5);
+							cout<<" ";
+						}
+						if(drgj[i].x==rx&&drgj[i].y+drgj[i].it==ry)
+						{
+							myHP--;
+							gotoxy(13+myHP,3);
+							cout<<" ";
+							gotoxy(rx+20,ry+5);	printf("%c",19);
+							Sleep(80);
+								
+							gotoxy(rx+20,ry+5);	printf("%c",1);	
+							//drgj[i].it=drgjjl;
+							drgj[i].pd=0;
+						}
+						else
+						{
+							if(mapa[drgj[i].y+drgj[i].it][drgj[i].x]==1)
+							{
+								gotoxy(drgj[i].x+20,drgj[i].y+drgj[i].it+5);
+								printf("%c",31);
+							}
+							else
+							{
+								if(mapa[drgj[i].y+drgj[i].it][drgj[i].x]==2)
+								{
+									drhp[drgj[i].y+drgj[i].it][drgj[i].x]--;
+								
+								}
+								//drgj[i].it=drgjjl;
+								drgj[i].pd=0;
+							}
+						}	
+					}
+					else if(drgj[i].fx==1)
+					{
+						if(drgj[i].it!=1)
+						{
+							gotoxy(drgj[i].x+20,drgj[i].y-drgj[i].it+1+5);
+							cout<<" ";
+						}
+						if(drgj[i].x==rx&&drgj[i].y-drgj[i].it==ry)
+						{
+							myHP--;
+							gotoxy(13+myHP,3);
+							cout<<" ";
+							gotoxy(rx+20,ry+5);	printf("%c",19);
+							Sleep(80);
+								
+							gotoxy(rx+20,ry+5);	printf("%c",1);	
+							//drgj[i].it=drgjjl;
+							drgj[i].pd=0;
+						}
+						else
+						{
+							if(mapa[drgj[i].y-drgj[i].it][drgj[i].x]==1)
+							{
+								gotoxy(drgj[i].x+20,drgj[i].y-drgj[i].it+5);
+								printf("%c",30);	
+							}
+							else
+							{
+								if(mapa[drgj[i].y-drgj[i].it][drgj[i].x]==2)
+								{
+									drhp[drgj[i].y-drgj[i].it][drgj[i].x]--;
+								
+								}
+								//drgj[i].it=drgjjl;
+								drgj[i].pd=0;
+							}
+						}	
+					}
+					else if(drgj[i].fx==2)
+					{
+						if(drgj[i].it!=1)
+						{
+							gotoxy(drgj[i].x+drgj[i].it-1+20,drgj[i].y+5);
+							cout<<" ";
+						}
+						if(drgj[i].x+drgj[i].it==rx&&drgj[i].y==ry)
+						{
+							myHP--;
+							gotoxy(13+myHP,3);
+							cout<<" ";
+							gotoxy(rx+20,ry+5);	printf("%c",19);
+							Sleep(80);
+								
+							gotoxy(rx+20,ry+5);	printf("%c",1);	
+							//drgj[i].it=drgjjl;
+							drgj[i].pd=0;
+						}
+						else
+						{
+							if(mapa[drgj[i].y][drgj[i].x+drgj[i].it]==1)
+							{
+								gotoxy(drgj[i].x+drgj[i].it+20,drgj[i].y+5);
+								printf("%c",16);	
+							}
+							else
+							{
+								if(mapa[drgj[i].y][drgj[i].x+drgj[i].it]==2)
+								{
+									drhp[drgj[i].y][drgj[i].x+drgj[i].it]--;
+									
+								}
+								//drgj[i].it=drgjjl;
+								drgj[i].pd=0;
+							}
+						}	
+					}
+					else if(drgj[i].fx==3)
+					{
+						if(drgj[i].it!=1)
+						{
+							gotoxy(drgj[i].x-drgj[i].it+1+20,drgj[i].y+5);
+							cout<<" ";
+						}
+						if(drgj[i].x-drgj[i].it==rx&&drgj[i].y==ry)
+						{
+							myHP--;
+							gotoxy(13+myHP,3);
+							cout<<" ";
+							gotoxy(rx+20,ry+5);	printf("%c",19);
+							Sleep(80);
+								
+							gotoxy(rx+20,ry+5);	printf("%c",1);	
+							//drgj[i].it=drgjjl;
+							drgj[i].pd=0;
+						}
+						else
+						{
+							if(mapa[drgj[i].y][drgj[i].x-drgj[i].it]==1)
+							{
+								gotoxy(drgj[i].x-drgj[i].it+20,drgj[i].y+5);
+								printf("%c",17);	
+							}
+							else
+							{
+								if(mapa[drgj[i].y][drgj[i].x-drgj[i].it]==2)
+								{
+									drhp[drgj[i].y][drgj[i].x-drgj[i].it]--;
+									
+								}
+								//drgj[i].it=drgjjl;
+								drgj[i].pd=0;
+							}
+						}	
+					}
+					drgj[i].it++;
+				}
+				else
+				{
+					if(drgj[i].fx==0)
+					{
+						gotoxy(drgj[i].x+20,drgj[i].y+drgj[i].it-1+5);
+						cout<<" ";
+					}
+					else if(drgj[i].fx==1)
+					{
+						gotoxy(drgj[i].x+20,drgj[i].y-drgj[i].it+1+5);
+						cout<<" ";
+					}
+					else if(drgj[i].fx==2)
+					{
+						gotoxy(drgj[i].x+drgj[i].it-1+20,drgj[i].y+5);
+						cout<<" ";
+					}
+					else if(drgj[i].fx==3)
+					{
+						gotoxy(drgj[i].x-drgj[i].it+1+20,drgj[i].y+5);
+						cout<<" ";
+					}
+					drgj[i].pd=0;
+				}	
+					
+			drt3=0;
+		}
+						
+		gotoxy(rx+20,ry+5);	printf("%c",1);		
+		
+		if(drt5==0)
+		{
+			for(int k=0;k<70;k++)
+			{
+				gotoxy(15+k,33);
+				cout<<" ";
+			}
+		}
+		
+			
+		if(drman<=1000&&drt2>=300)//Ëæ»úÉú³ÉµÐÈË 
+		{
+			int drx=rand()%(hx)+1;
+			int dry=rand()%(hy)+1;
+			if(mapa[drx][dry]==1&&dry!=rx&&drx!=ry)
+			{
+				mapa[drx][dry]=2;
+				drhp[drx][dry]=8;
+				gotoxy(dry+20,drx+5);
+				printf("%c",2);
+				drman++;
+			}
+			drt2=0;
+		}
+		
+		for(int i=1;i<=hx;i++)
+			for(int j=1;j<=hy;j++)
+			{
+				if(mapa[i][j]==2)
+					if(drhp[i][j]<=0)
+					{
+						drman--;
+						mapa[i][j]=1;
+						drt4[i][j]=-10;
+						gotoxy(j+20,i+5);
+						printf("%c",19);
+					}
+				if(drt4[i][j]<=-1)
+				{
+					drt4[i][j]++;
+					gotoxy(j+20,i+5);
+					printf("%c",19);
+					if(drt4[i][j]==0)
+					{
+						gotoxy(j+20,i+5);
+						cout<<" ";
+					}
+				}
+			}
+				
+		
+		
+		if(drt1>=100)//µÐÈËÐÐ¶¯·½Ê½ 
+		{
+			for(int i=1;i<=hx;i++)
+			{
+				for(int j=1;j<=hy;j++)
+				{
+					if(mapa[i][j]==2)
+					{
+						int drfx=rand()%(100)+1;
+						int drxd=rand()%(100)+1;
+						drfx%=4;
+						drxd%=2;
+						if(	i+fx[drfx]>0&&i+fx[drfx]<hx+1&&
+							j+fy[drfx]>0&&j+fy[drfx]<hy+1&&
+							mapa[i+fx[drfx]][j+fy[drfx]]==1)
+						{
+							if(drxd==1)
+							{
+								mapa[i][j]=1;
+								gotoxy(j+20,i+5);
+								cout<<" ";
+							
+								mapa[i+fx[drfx]][j+fy[drfx]]=2;
+								drhp[i+fx[drfx]][j+fy[drfx]]=drhp[i][j];
+								drhp[i][j]=0;
+								gotoxy(j+fy[drfx]+20,i+fx[drfx]+5);
+								printf("%c",2);
+							}
+							else
+							{
+								for(int k=0;k<100;k++)
+								{
+									if(drgj[k].pd==0)
+									{
+										drgj[k].x=j;
+										drgj[k].y=i;
+										drgj[k].fx=drfx;
+										drgj[k].it=1;
+										drgj[k].pd=1;
+										break;
+									}
+								}
+							}
+							
+							
+						}	
+					}
+				}
+			}
+			drt1=0;
+		}
+
+		rt1++;
+		drt1++;
+		drt2++;
+		drt3++;
+		drt5--;
+		mapt1++;
+		
+		Sleep(10);
+		
+		}
+		else if(mappd==2)
+		{
+			gotoxy(rx+20,ry+5);
+			printf(" ");
+			
+			store();
+			gomap();
+			
+			memset(drt4,0,sizeof(drt4));
+			memset(drhp,0,sizeof(drhp));
+			memset(mygj,0,sizeof(mygj));
+			memset(drgj,0,sizeof(drgj));
+			gotoxy(rx+20,ry+5);
+			printf("%c",1);
+	
+			gotoxy(10,3);
+			cout<<"HP:";
+			for(int i=0;i<myHP;i++)
+				printf("%c", 3);
+	
+			gotoxy(65,3);
+			printf("%c %d",15,money);
+			
+		}
+	}
+}
+
+void gamemain()
+{
+//	1	¿ªÊ¼	2	¹ØÓÚ	3	ÍË³ö
+	int jtzx=1;
+	while(in=getch())
+	{
+		if(in=='s'&&jtzx<3)
+		{
+			if(jtzx==1)
+			{
+				gotoxy(50+20,14+5);
+				printf(" ");
+				gotoxy(50+20,18+5);
+				printf("%c",16);
+			}
+			else if(jtzx==2)
+			{
+				gotoxy(50+20,18+5);
+				printf(" ");
+				gotoxy(50+20,22+5);
+				printf("%c",16);
+			}
+			jtzx++;
+		}
+		else if(in=='w'&&jtzx>1)
+		{
+			if(jtzx==2)
+			{
+				gotoxy(50+20,14+5);
+				printf("%c",16);
+				gotoxy(50+20,18+5);
+				printf(" ");
+			}
+			else if(jtzx==3)
+			{
+				gotoxy(50+20,18+5);
+				printf("%c",16);
+				gotoxy(50+20,22+5);
+				printf(" ");
+			}
+			jtzx--;
+		}
+		else if(in==' ')
+		{
+			if(jtzx==1)
+			{
+				system("cls");
+				//cg1();
+				
+				cg2();
+	
+				gomap();
+	
+				game();
+				
+				jtzx=1;
+				gameout();
+			}//¿ªÊ¼ÓÎÏ· 
+			else if(jtzx==2)
+			{
+				
+			}//¶ÁÈ¡´æµµ 
+			else if(jtzx==3)
+			{
+				system("cls");
+				gyout();
+				jtzx=1;
+				gameout();
+			}//ÓÎÏ·ËµÃ÷ 
+		}
+		else if(in==8)
+		{
+			return;
+		}
+		//gotoxy(80,25);
+	}
+}
+
+
+int main()
+{
+	system("mode con cols=90 lines=40");
+	
+	HideCursor();
+	
+	gameout();
+	
+	gamemain();
+
+	return 0;
+}
+
